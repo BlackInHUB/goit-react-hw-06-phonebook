@@ -1,24 +1,25 @@
 import React from "react";
-import PropTypes from 'prop-types'
 import { List, ListItem, ListItemText, DeleteBtn } from "./ContactsList.styled";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteContact, getContacts, getFilter } from "redux/phonebookSlice";
 
-export const ContactsList = ({ contacts, onDeleteBtnClick }) => {
+export const ContactsList = () => {
+    const contacts = useSelector(getContacts)
+    const filter = useSelector(getFilter)
+    const dispatch = useDispatch()
+
+    const onDeleteBtn = (e) => {
+        dispatch(deleteContact(e.target.id))
+    }
+
+    const contactsToRender = contacts.filter(contact => contact.name.toLowerCase().includes(filter.toLowerCase()))
 
     return (
         <List>
-            {contacts.map(({ name, number, id }) => (<ListItem key={id}>
-                <ListItemText>{name}: {number}</ListItemText>
-                <DeleteBtn type="button" id={id} onClick={() => onDeleteBtnClick(id)}>Delete</DeleteBtn>
-            </ListItem>))}
+        {contactsToRender.map(({ name, number, id }) => (<ListItem key={id}>
+            <ListItemText>{name}: {number}</ListItemText>
+            <DeleteBtn type="button" id={id} onClick={onDeleteBtn}>Delete</DeleteBtn>
+        </ListItem>))}
         </List>
     )
-}
-
-ContactsList.propTypes = {
-    contacts: PropTypes.arrayOf(PropTypes.exact({
-        name: PropTypes.string.isRequired,
-        number: PropTypes.string.isRequired,
-        id: PropTypes.string.isRequired
-    })),
-    onDeleteBtnClick: PropTypes.func.isRequired,
 }
